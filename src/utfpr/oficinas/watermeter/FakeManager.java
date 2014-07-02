@@ -46,11 +46,11 @@ public class FakeManager {
 		
 	}
 	
-	public ArrayList<Medicao> getMedicoesByMonth(int month) {
+	public ArrayList<Medicao> getMedicoesByMonth(int month, int year) {
 
 		ArrayList<Medicao> medicoesAux = new ArrayList<Medicao>();
 		
-		for(Medicao medicao : medicoes) 
+		for(Medicao medicao : getMedicoesByYear(year)) 
 			if(medicao.getMes() == month) 
 				medicoesAux.add(medicao);
 		
@@ -58,11 +58,11 @@ public class FakeManager {
 		
 	}
 	
-	public ArrayList<Medicao> getMedicoesByDay(int day) {
+	public ArrayList<Medicao> getMedicoesByDay(int day, int month, int year) {
 
 		ArrayList<Medicao> medicoesAux = new ArrayList<Medicao>();
 		
-		for(Medicao medicao : medicoes) 
+		for(Medicao medicao : getMedicoesByMonth(month, year)) 
 			if(medicao.getDia() == day) 
 				medicoesAux.add(medicao);
 		
@@ -138,6 +138,82 @@ public class FakeManager {
 			
 			if(medicao.getMes() > max)
 				max = medicao.getMes();
+		}
+		
+		return max;
+	}
+	
+	public Integer getMinDay(int month, int year) {
+
+		Integer min = null;
+		ArrayList<Medicao> medicoesMes = getMedicoesByMonth(month, year);
+		
+		for(Medicao medicao : medicoesMes) {
+			if(min == null) {
+				min = medicao.getDia();
+				continue;
+			}
+			
+			if(medicao.getDia() < min)
+				min = medicao.getDia();
+		}
+
+		return min;
+		
+	}
+	
+	public Integer getMaxDay(int month, int year) {
+
+		Integer max = null;
+		
+		ArrayList<Medicao> medicoesMes = getMedicoesByMonth(month, year);
+		
+		for(Medicao medicao : medicoesMes) {
+			if(max == null) {
+				max = medicao.getDia();
+				continue;
+			}
+			
+			if(medicao.getDia() > max)
+				max = medicao.getDia();
+		}
+		
+		return max;
+	}
+	
+	public Integer getMinHour(int day, int month, int year) {
+
+		Integer min = null;
+		ArrayList<Medicao> medicoesDia = getMedicoesByDay(day, month, year);
+		
+		for(Medicao medicao : medicoesDia) {
+			if(min == null) {
+				min = medicao.getHora();
+				continue;
+			}
+			
+			if(medicao.getHora() < min)
+				min = medicao.getHora();
+		}
+
+		return min;
+		
+	}
+	
+	public Integer getMaxHour(int day, int month, int year) {
+
+		Integer max = null;
+		
+		ArrayList<Medicao> medicoesDia = getMedicoesByDay(day, month, year);
+		
+		for(Medicao medicao : medicoesDia) {
+			if(max == null) {
+				max = medicao.getHora();
+				continue;
+			}
+			
+			if(medicao.getHora() > max)
+				max = medicao.getHora();
 		}
 		
 		return max;
