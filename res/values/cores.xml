@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fundoTela">#496eb8</color>
+    <color name="texto">#ffffff</color>
+    <color name="botaoClicado">#6699ff</color>
+</resources>
