@@ -14,8 +14,8 @@ public class FakeManager {
 		
 		for(int i=0; i<1000; i++) {
 			
-			dia = (int)(Math.random() * (30 + 1));
-			mes = (int)(Math.random() * (12 + 1));
+			dia = 1 + (int)(Math.random() * (30 + 1));
+			mes = 1 + (int)(Math.random() * (11 + 1));
 			ano = 2004 + (int)(Math.random() * (10 + 1));
 			hora = (int)(Math.random() * (23 + 1));
 			litro = (int)(Math.random() * (20 + 1));
@@ -64,6 +64,18 @@ public class FakeManager {
 		
 		for(Medicao medicao : getMedicoesByMonth(month, year)) 
 			if(medicao.getDia() == day) 
+				medicoesAux.add(medicao);
+		
+		return medicoesAux;
+		
+	}
+	
+	public ArrayList<Medicao> getMedicoesByHour(int hour, int day, int month, int year) {
+
+		ArrayList<Medicao> medicoesAux = new ArrayList<Medicao>();
+		
+		for(Medicao medicao : getMedicoesByDay(day, month, year)) 
+			if(medicao.getHora() == hour) 
 				medicoesAux.add(medicao);
 		
 		return medicoesAux;
