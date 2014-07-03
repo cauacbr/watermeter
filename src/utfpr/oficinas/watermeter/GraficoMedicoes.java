@@ -129,7 +129,7 @@ public class GraficoMedicoes extends View{
 	                	for(Rect barraAtual: barras) {
 	                		
 	                		if(barraAtual.contains(startX, startY)) {
-	                			Log.d("motion", "Clique na Barra " + barras.indexOf(barraAtual));
+	                			//Log.d("motion", "Clique na Barra " + barras.indexOf(barraAtual));
 	                			
 	                			calcularExpansao(barras.indexOf(barraAtual));
 	                			
@@ -248,32 +248,37 @@ public class GraficoMedicoes extends View{
 				
 				//*********************************
 				
-			
+
+				//Log.d("motion", "quantities.size() = " + quantities.size());
 				
-				for(Integer bar : quantities) {
+				for(int i = 0; i < quantities.size(); i++) {
+					
+					//Log.d("motion", "i = " + i);
 					
 					auxRect = new Rect();
-					auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
+					auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
 					
 					barras.add(auxRect);
 					canvas.drawRect(auxRect, barsPaint);
 					
 					canvas.save();
-					canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
+					canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
 					
 
 					// Desenhando as legendas de consumo
 					
-					canvas.drawText(quantitiesLabel.get(quantities.indexOf(bar)), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
+					canvas.drawText(quantitiesLabel.get(i), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 					//canvas.drawText(String.valueOf((float)(bar)/maiorMedicaoAcumulada), x0 + offset + (barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 					
 					canvas.restore();
 					
 					// Desenhando as legendas de datas
 					
-					canvas.drawText(datesLabel.get(quantities.indexOf(bar)), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))) /2 ), y0 + teste.getTextSize() + 5, teste);
+					canvas.drawText(datesLabel.get(i), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(i))) /2 ), y0 + teste.getTextSize() + 5, teste);
 					
 					offset += barMargin + barWidth;
+					
+					//Log.d("motion", "fim i = " + i);
 					
 				}
 
@@ -298,8 +303,36 @@ public class GraficoMedicoes extends View{
 						quantities.add(sumConsumoLitros + sumConsumoMililitros/500); //arredonda para cima o comprimento da barra
 						
 						quantitiesLabel.add(String.valueOf(sumConsumoLitros) + "," + String.valueOf(sumConsumoMililitros/100 + " L"));
-						datesLabel.add(String.valueOf(i));
 						
+						switch(i) {
+						
+							case 1:
+								datesLabel.add("Jan");
+							case 2:
+								datesLabel.add("Fev");
+							case 3:
+								datesLabel.add("Mar");
+							case 4:
+								datesLabel.add("Abr");
+							case 5:
+								datesLabel.add("Mai");
+							case 6:
+								datesLabel.add("Jun");
+							case 7:
+								datesLabel.add("Jul");
+							case 8:
+								datesLabel.add("Ago");
+							case 9:
+								datesLabel.add("Set");
+							case 10:
+								datesLabel.add("Out");
+							case 11:
+								datesLabel.add("Nov");
+							case 12:
+								datesLabel.add("Dez");
+						
+						}
+						 
 						if((sumConsumoLitros + sumConsumoMililitros/500) > maiorMedicaoAcumulada)
 							maiorMedicaoAcumulada = (sumConsumoLitros + 1);
 						
@@ -319,30 +352,36 @@ public class GraficoMedicoes extends View{
 					
 					//Log.d("motion", "maior medição acumulada: " + maiorMedicaoAcumulada);
 					
-					for(Integer bar : quantities) {
+					//Log.d("motion", "quantities.size() = " + quantities.size());
+					
+					for(int i = 0; i < quantities.size(); i++) {
+						
+						//Log.d("motion", "i = " + i);
 						
 						auxRect = new Rect();
-						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
+						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
 						
 						barras.add(auxRect);
 						canvas.drawRect(auxRect, barsPaint);
 						
 						canvas.save();
-						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
+						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
 						
 	
 						// Desenhando as legendas de consumo
 						
-						canvas.drawText(quantitiesLabel.get(quantities.indexOf(bar)), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
+						canvas.drawText(quantitiesLabel.get(i), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						//canvas.drawText(String.valueOf((float)(bar)/maiorMedicaoAcumulada), x0 + offset + (barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						
 						canvas.restore();
 						
 						// Desenhando as legendas de datas
 						
-						canvas.drawText(datesLabel.get(quantities.indexOf(bar)), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))) /2 ), y0 + teste.getTextSize() + 5, teste);
+						canvas.drawText(datesLabel.get(i), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(i))) /2 ), y0 + teste.getTextSize() + 5, teste);
 						
 						offset += barMargin + barWidth;
+						
+						//Log.d("motion", "fim i = " + i);
 						
 					}
 	
@@ -386,30 +425,36 @@ public class GraficoMedicoes extends View{
 					
 					//Log.d("motion", "maior medição acumulada: " + maiorMedicaoAcumulada);
 					
-					for(Integer bar : quantities) {
+					//Log.d("motion", "quantities.size() = " + quantities.size());
+					
+					for(int i = 0; i < quantities.size(); i++) {
+						
+						//Log.d("motion", "i = " + i);
 						
 						auxRect = new Rect();
-						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
+						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
 						
 						barras.add(auxRect);
 						canvas.drawRect(auxRect, barsPaint);
 						
 						canvas.save();
-						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
+						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
 						
 	
 						// Desenhando as legendas de consumo
 						
-						canvas.drawText(quantitiesLabel.get(quantities.indexOf(bar)), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
+						canvas.drawText(quantitiesLabel.get(i), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						//canvas.drawText(String.valueOf((float)(bar)/maiorMedicaoAcumulada), x0 + offset + (barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						
 						canvas.restore();
 						
 						// Desenhando as legendas de datas
 						
-						canvas.drawText(datesLabel.get(quantities.indexOf(bar)), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))) /2 ), y0 + teste.getTextSize() + 5, teste);
+						canvas.drawText(datesLabel.get(i), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(i))) /2 ), y0 + teste.getTextSize() + 5, teste);
 						
 						offset += barMargin + barWidth;
+						
+						//Log.d("motion", "fim i = " + i);
 						
 					}
 	
@@ -441,42 +486,47 @@ public class GraficoMedicoes extends View{
 												
 						sumConsumoLitros = sumConsumoMililitros = 0;
 						
-						
 												
 					}
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((dbManager.getMaxDay(currentZoomRefMes, currentZoomRefAno) - dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
-					
+					MIN_TRANSLATION = -1*((dbManager.getMaxHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno) - dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+										
 					//*********************************
 					
 					//Log.d("motion", "maior medição acumulada: " + maiorMedicaoAcumulada);
 					
-					for(Integer bar : quantities) {
+					//Log.d("motion", "quantities.size() = " + quantities.size());
+					
+					for(int i = 0; i < quantities.size(); i++) {
+						
+						//Log.d("motion", "i = " + i);
 						
 						auxRect = new Rect();
-						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
+						auxRect.set((int) (x0 + offset + actualTranslation), (int) (y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))), (int) (x0 + offset + actualTranslation + barWidth), (int) (y0));
 						
 						barras.add(auxRect);
 						canvas.drawRect(auxRect, barsPaint);
 						
 						canvas.save();
-						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
+						canvas.rotate(-60,  (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()));
 						
 	
 						// Desenhando as legendas de consumo
 						
-						canvas.drawText(quantitiesLabel.get(quantities.indexOf(bar)), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
+						canvas.drawText(quantitiesLabel.get(i), (float) (x0 + offset + actualTranslation + (barWidth/4.5)), (float) ((y0 - (barHeight * ((float)(quantities.get(i))/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						//canvas.drawText(String.valueOf((float)(bar)/maiorMedicaoAcumulada), x0 + offset + (barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))), (float) ((y0 - (barHeight * ((float)(bar)/maiorMedicaoAcumulada))) - 0.3*teste.getTextSize()), teste);
 						
 						canvas.restore();
 						
 						// Desenhando as legendas de datas
 						
-						canvas.drawText(datesLabel.get(quantities.indexOf(bar)), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(quantities.indexOf(bar)))) /2 ), y0 + teste.getTextSize() + 5, teste);
+						canvas.drawText(datesLabel.get(i), x0 + offset + actualTranslation + ((barWidth - teste.measureText(datesLabel.get(i))) /2 ), y0 + teste.getTextSize() + 5, teste);
 						
 						offset += barMargin + barWidth;
+						
+						//Log.d("motion", "fim i = " + i);
 						
 					}
 	
@@ -488,6 +538,10 @@ public class GraficoMedicoes extends View{
 				
 		
 		}
+		
+		
+		MIN_TRANSLATION = (MIN_TRANSLATION > 0) ? 0 : MIN_TRANSLATION; //Correção de Bug de Translação
+		
 
 	}
 	
