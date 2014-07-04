@@ -189,8 +189,8 @@ public class GraficoMedicoes extends View{
 		
 		//Desenhando as linhas de Fundo
 		
-		canvas.drawLine(viewWidth/20, (float) (viewHeight*0.75), (float) (viewWidth*0.95), (float) (viewHeight*0.75), background);
-		canvas.drawLine(viewWidth/20, viewHeight/20, viewWidth/20, (float) (viewHeight*0.75), background);
+		canvas.drawLine(viewWidth/20, (float) (viewHeight*0.8), (float) (viewWidth*0.95), (float) (viewHeight*0.8), background);
+		canvas.drawLine(viewWidth/20, (float) (viewHeight*0.1), viewWidth/20, (float) (viewHeight*0.8), background);
 		
 		int maiorMedicaoAcumulada;
 		int offset;
@@ -202,10 +202,14 @@ public class GraficoMedicoes extends View{
 		teste.setStyle(Style.FILL);
 		
 		offset = barMargin;
-		x0 = viewWidth/20;
-		y0 = (float) (viewHeight*0.75);	
+		x0 = (float) (viewWidth*0.05);
+		y0 = (float) (viewHeight*0.8);	
 		
-		barras.clear(); //Limpa lista de barras atuais
+		//Legenda do Zoom
+		canvas.drawText(getLegendaZoom(), viewWidth/2 - teste.measureText(getLegendaZoom())/2, (float) (teste.getTextSize()*1.2), teste);
+			
+		
+		barras.clear(); //Limpa lista de barras atuais, caso o zoom tenha mudado
 		quantities.clear(); //Limpa medições atuais
 		datesLabel.clear();
 		quantitiesLabel.clear();
@@ -573,6 +577,121 @@ public class GraficoMedicoes extends View{
 		actualTranslation = 0;
 		
 		
+	}
+	
+	private String getLegendaZoom() {
+		
+		String legenda = "";
+		
+		switch(currentZoom) {
+		
+			case ZOOM_MONTHS:
+			
+				return String.valueOf(currentZoomRefAno);
+				
+			case ZOOM_DAYS:
+				
+				switch(currentZoomRefMes) {
+				
+					case 1:
+						legenda += "Jan";
+						break;
+					case 2:
+						legenda += "Fev";
+						break;
+					case 3:
+						legenda += "Mar";
+						break;
+					case 4:
+						legenda += "Abr";
+						break;
+					case 5:
+						legenda += "Mai";
+						break;
+					case 6:
+						legenda += "Jun";
+						break;
+					case 7:
+						legenda += "Jul";
+						break;
+					case 8:
+						legenda += "Ago";
+						break;
+					case 9:
+						legenda += "Set";
+						break;
+					case 10:
+						legenda += "Out";
+						 break;
+					case 11:
+						legenda += "Nov";
+						break;
+					case 12:
+						legenda += "Dez";
+						break;
+				}
+				
+				legenda += "/";
+				
+				legenda += String.valueOf(currentZoomRefAno);
+				
+				return legenda;
+				
+			case ZOOM_HOURS:
+				
+				legenda += String.valueOf(currentZoomRefDia);
+				
+				legenda += "/";
+				
+				switch(currentZoomRefMes) {
+				
+					case 1:
+						legenda += "Jan";
+						break;
+					case 2:
+						legenda += "Fev";
+						break;
+					case 3:
+						legenda += "Mar";
+						break;
+					case 4:
+						legenda += "Abr";
+						break;
+					case 5:
+						legenda += "Mai";
+						break;
+					case 6:
+						legenda += "Jun";
+						break;
+					case 7:
+						legenda += "Jul";
+						break;
+					case 8:
+						legenda += "Ago";
+						break;
+					case 9:
+						legenda += "Set";
+						break;
+					case 10:
+						legenda += "Out";
+						 break;
+					case 11:
+						legenda += "Nov";
+						break;
+					case 12:
+						legenda += "Dez";
+						break;
+				}
+				
+				legenda += "/";
+				
+				legenda += String.valueOf(currentZoomRefAno);
+				
+				return legenda;
+						
+		}
+		
+		return "";
 		
 	}
 	
