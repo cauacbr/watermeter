@@ -1,6 +1,8 @@
 package utfpr.oficinas.watermeter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
@@ -29,6 +31,7 @@ public class GraficoMedicoes extends View{
 	private int currentZoomRefAno = -1;
 	private int currentZoomRefMes = -1;
 	private int currentZoomRefDia = -1;
+	Calendar dataAux;
 	
 	private Paint background, barsPaint;
 	private int barMargin, barWidth, barHeight;
@@ -207,7 +210,27 @@ public class GraficoMedicoes extends View{
 		
 		//Legenda do Zoom
 		canvas.drawText(getLegendaZoom(), viewWidth/2 - teste.measureText(getLegendaZoom())/2, (float) (teste.getTextSize()*1.2), teste);
+		
+		//Legenda do eixo X
+		switch(currentZoom) {
 			
+		case ZOOM_YEARS:
+			canvas.drawText("Ano", viewWidth/2 - teste.measureText("Ano")/2, (float) (y0 + 3*teste.getTextSize()), teste);
+			break;
+			
+		case ZOOM_MONTHS:
+			canvas.drawText("Mês", viewWidth/2 - teste.measureText("Mês")/2, (float) (y0 + 3*teste.getTextSize()), teste);
+			break;
+			
+		case ZOOM_DAYS:
+			canvas.drawText("Dia", viewWidth/2 - teste.measureText("Dia")/2, (float) (y0 + 3*teste.getTextSize()), teste);
+			break;
+			
+		case ZOOM_HOURS:
+			canvas.drawText("Hora", viewWidth/2 - teste.measureText("Hora")/2, (float) (y0 + 3*teste.getTextSize()), teste);
+			break;
+		
+		}
 		
 		barras.clear(); //Limpa lista de barras atuais, caso o zoom tenha mudado
 		quantities.clear(); //Limpa medições atuais
@@ -294,7 +317,9 @@ public class GraficoMedicoes extends View{
 				
 				case ZOOM_MONTHS: /********************************************************** ZOOM_MONTH **********************************************************************************/
 										
-					for(int i = dbManager.getMinMonth(currentZoomRefAno) ; i <= dbManager.getMaxMonth(currentZoomRefAno); i++) {
+					
+					
+					for(int i = dbManager.getMinMonth(currentZoomRefAno) ; i <= 12; i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByMonth(i, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -350,7 +375,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((dbManager.getMaxMonth(currentZoomRefAno) - dbManager.getMinMonth(currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*((12 - dbManager.getMinMonth(currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 					
 					//*********************************
 					
@@ -397,7 +422,9 @@ public class GraficoMedicoes extends View{
 				
 				case ZOOM_DAYS: /********************************************************** ZOOM_DAY **********************************************************************************/
 					
-					for(int i = dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno) ; i <= dbManager.getMaxDay(currentZoomRefMes, currentZoomRefAno); i++) {
+					configDataAux(); //Arruma o calendário para descobrir o maior dia do mês no mês em zoom
+					
+					for(int i = dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno) ; i <= dataAux.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByDay(i, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -423,7 +450,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((dbManager.getMaxDay(currentZoomRefMes, currentZoomRefAno) - dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*((dataAux.getActualMaximum(Calendar.DAY_OF_MONTH) - dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 					
 					//*********************************
 					
@@ -470,7 +497,7 @@ public class GraficoMedicoes extends View{
 				
 				case ZOOM_HOURS: /********************************************************** ZOOM_HOUR **********************************************************************************/
 					
-					for(int i = dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno) ; i <= dbManager.getMaxHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno); i++) {
+					for(int i = dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno) ; i <= 23; i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByHour(i, currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -495,7 +522,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((dbManager.getMaxHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno) - dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*((23 - dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 										
 					//*********************************
 					
@@ -692,6 +719,73 @@ public class GraficoMedicoes extends View{
 		}
 		
 		return "";
+		
+	}
+	
+	private void configDataAux() {
+		
+		int dia = 1;
+		int ano = currentZoomRefAno;
+		int mes = 0;
+		
+		switch(currentZoomRefMes) {
+		
+			case 1:
+				mes = Calendar.JANUARY;
+				break;
+				
+			case 2:
+				mes = Calendar.FEBRUARY;
+				break;
+				
+			case 3:
+				mes = Calendar.MARCH;
+				break;
+				
+			case 4:
+				mes = Calendar.APRIL;
+				break;
+				
+			case 5:
+				mes = Calendar.MAY;
+				break;
+				
+			case 6:
+				mes = Calendar.JUNE;
+				break;
+				
+			case 7:
+				mes = Calendar.JULY;
+				break;
+				
+			case 8:
+				mes = Calendar.AUGUST;
+				break;
+				
+			case 9:
+				mes = Calendar.SEPTEMBER;
+				break;
+				
+			case 10:
+				mes = Calendar.OCTOBER;
+				break;
+				
+			case 11:
+				mes = Calendar.NOVEMBER;
+				break;
+				
+			case 12:
+				mes = Calendar.DECEMBER;
+				break;
+				
+		}
+		
+		Log.d("motion", "data: " + dia + "/" + mes + "/" + ano);
+		Log.d("motion", "mes: " + currentZoomRefMes);
+		
+		dataAux = new GregorianCalendar(ano, mes, dia);
+		
+		return;
 		
 	}
 	
