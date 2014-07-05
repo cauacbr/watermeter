@@ -6,6 +6,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,8 +15,12 @@ import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 /**
@@ -22,6 +28,8 @@ import android.view.View;
  *
  */
 public class GraficoMedicoes extends View{
+		
+	public final View currentInstance = this;
 	
 	private static final int ZOOM_YEARS = 0;
 	private static final int ZOOM_MONTHS = 1;
@@ -31,15 +39,16 @@ public class GraficoMedicoes extends View{
 	private int currentZoomRefAno = -1;
 	private int currentZoomRefMes = -1;
 	private int currentZoomRefDia = -1;
-	Calendar dataAux;
+	private Calendar dataAux;
 	
 	private Paint background, barsPaint;
 	private int barMargin, barWidth, barHeight;
-	private Paint bars[];
 	private ArrayList<String> quantitiesLabel = new ArrayList<String>(); 
 	private ArrayList<String> datesLabel = new ArrayList<String>();
-	
 	private ArrayList<Integer> quantities = new ArrayList<Integer>();
+	
+	private Bitmap btnMenosZoom = BitmapFactory.decodeResource(getResources(), R.drawable.btn_menos_zoom);
+	private Rect fundoBtnMenosZoom = new Rect();
 	
 	private FakeManager dbManager = new FakeManager();
 	
@@ -50,8 +59,8 @@ public class GraficoMedicoes extends View{
     
     //************** BARRAS DO GRÁFICO
     
-    List<Rect> barras = new ArrayList<Rect>();
-    Rect auxRect = new Rect();
+    private List<Rect> barras = new ArrayList<Rect>();
+    private Rect auxRect = new Rect();
     
     
     //**************
@@ -127,18 +136,27 @@ public class GraficoMedicoes extends View{
 	                
 	                if(Math.abs(startX - endX) < 50) { //Deslizou no máximo 50 pixels
 	                	
-	                	Log.d("motion", "clique na view do gráfico");
+	                	//Log.d("motion", "clique na view do gráfico");
 	                	
 	                	for(Rect barraAtual: barras) {
 	                		
 	                		if(barraAtual.contains(startX, startY)) {
 	                			//Log.d("motion", "Clique na Barra " + barras.indexOf(barraAtual));
 	                			
+	                			currentInstance.playSoundEffect(SoundEffectConstants.CLICK);
 	                			calcularExpansao(barras.indexOf(barraAtual));
 	                			
 	                			v.invalidate();
 	                			
 	                		}
+	                		
+	                	}
+	                	
+	                	if(fundoBtnMenosZoom.contains(startX, startY)) {
+	                		
+	                		currentInstance.playSoundEffect(SoundEffectConstants.CLICK);
+	                		calcularContracao();
+	                		v.invalidate();
 	                		
 	                	}
 	                	
@@ -152,6 +170,7 @@ public class GraficoMedicoes extends View{
 	
 	public GraficoMedicoes(Context context) {
 		super(context);
+		btnMenosZoom = Bitmap.createScaledBitmap(btnMenosZoom, btnMenosZoom.getWidth()/2, btnMenosZoom.getHeight()/2, true);
 	}
 	
 	@Override
@@ -204,6 +223,7 @@ public class GraficoMedicoes extends View{
 		teste.setColor(Color.WHITE);
 		teste.setStyle(Style.FILL);
 		
+		
 		offset = barMargin;
 		x0 = (float) (viewWidth*0.05);
 		y0 = (float) (viewHeight*0.8);	
@@ -229,6 +249,16 @@ public class GraficoMedicoes extends View{
 		case ZOOM_HOURS:
 			canvas.drawText("Hora", viewWidth/2 - teste.measureText("Hora")/2, (float) (y0 + 3*teste.getTextSize()), teste);
 			break;
+		
+		}
+		
+		//Botão de Menos Zoom
+		if(currentZoom != ZOOM_YEARS) {
+			
+			fundoBtnMenosZoom.set(viewWidth/2 - btnMenosZoom.getWidth()/2, (int) (viewHeight*0.9), viewWidth/2 - btnMenosZoom.getWidth()/2 + btnMenosZoom.getWidth(), (int) (viewHeight*0.9) + btnMenosZoom.getHeight());
+			canvas.drawBitmap(btnMenosZoom, viewWidth/2 - btnMenosZoom.getWidth()/2, (float) (viewHeight*0.9), teste);
+			
+			//canvas.drawRect(fundoBtnMenosZoom, teste);
 		
 		}
 		
@@ -597,6 +627,29 @@ public class GraficoMedicoes extends View{
 			case ZOOM_DAYS:
 				currentZoomRefDia = dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno) + index;
 				currentZoom = ZOOM_HOURS;
+				break;
+			
+		}
+		
+		actualTranslation = 0;
+		
+		
+	}
+	
+	private void calcularContracao() {
+		
+		switch(currentZoom) {
+		
+			case ZOOM_HOURS:
+				currentZoom = ZOOM_DAYS;
+				break;
+				
+			case ZOOM_MONTHS:
+				currentZoom = ZOOM_YEARS;
+				break;
+				
+			case ZOOM_DAYS:
+				currentZoom = ZOOM_MONTHS;
 				break;
 			
 		}
