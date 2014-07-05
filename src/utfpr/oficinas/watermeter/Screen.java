@@ -9,6 +9,8 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
@@ -34,7 +36,7 @@ public class Screen {
 	private GraficoMedicoes grafico;
 	
 	private View.OnClickListener voltarListener;
-	private View.OnClickListener listenerSincronizar, listenerConsumo;
+	private View.OnTouchListener listenerSincronizar, listenerConsumo;
 	
 	
 	public Screen(String title, RelativeLayout content, int displayWidth, int displayHeight) {
@@ -201,11 +203,10 @@ public class Screen {
                                   
         ImageView icon_sincronizar = new ImageView(context);
         ImageView icon_consumo = new ImageView(context);
-        ImageView logoMenu = new ImageView(context);
+        View logoMenu = new BtnLogoMenuPrincipal(context);
         
         icon_sincronizar.setImageDrawable(context.getResources().getDrawable(R.drawable.btn_sincronizar));
         icon_consumo.setImageDrawable(context.getResources().getDrawable(R.drawable.btn_consumo));
-        logoMenu.setImageDrawable(context.getResources().getDrawable(R.drawable.logo_menu));
         
         bgBtnSinc.width = displayWidth;
         bgBtnSinc.height = halfTopo.height/3;
@@ -242,57 +243,52 @@ public class Screen {
 
         configMenuListeners(context, tela);
 		
-		containerSincronizar.setOnClickListener(listenerSincronizar);
-        containerConsumo.setOnClickListener(listenerConsumo);
+		containerSincronizar.setOnTouchListener(listenerSincronizar);
+        containerConsumo.setOnTouchListener(listenerConsumo);
     	
     }
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN) public final void configMenuListeners(final Context context, final RelativeLayout tela) {
 		
-		listenerSincronizar = new View.OnClickListener() {
+		listenerSincronizar = new View.OnTouchListener() {
 			
 			@Override
-			public void onClick(View v) {
-								
-				Toast.makeText(context, "Procurando Dispositivo...", Toast.LENGTH_LONG).show();
+			public boolean onTouch(View v, MotionEvent event) {
 				
+				if(event.getY() > displayHeight/3) {
+					return false;
+				}
+				
+				v.playSoundEffect(SoundEffectConstants.CLICK);
+				
+				//Configurar Bluetooth a partir daqui
+				
+				Toast.makeText(context, "Procurando Leitor de Consumo...", Toast.LENGTH_LONG).show();
+				
+				//Fim configurar Bluetooth
+
+				return false;
 			}
 			
 		};
 		
-		listenerConsumo = new View.OnClickListener() {
+		
+		listenerConsumo = new View.OnTouchListener() {
 			
 			@Override
-			public void onClick(View v) {
-								
+			public boolean onTouch(View v, MotionEvent event) {
+				
+				if(event.getY() < displayHeight/6) {
+					return false;
+				}
+				
+				v.playSoundEffect(SoundEffectConstants.CLICK);
+										
 				RelativeLayout conteudo = new RelativeLayout(context);
 				
 				grafico = new GraficoMedicoes(context);
 				
 				conteudo.addView(grafico);
-				
-				//Apenas Entrega 2
-				
-				/*ImageView graficoExemplo = new ImageView(context);
-				graficoExemplo.setImageDrawable(context.getResources().getDrawable(R.drawable.grafico_exemplo));
-				
-				conteudoTeste.addView(graficoExemplo);
-				
-				View.OnClickListener listenerTeste = new View.OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-
-						Toast.makeText(context, "Gráfico Ilustrativo por enquanto...", Toast.LENGTH_LONG).show();
-						
-						
-					}
-				};
-				
-				graficoExemplo.setOnClickListener(listenerTeste);*/
-				
-				//Fim apenas entrega 2
-				
 				
 		        final Screen consumo = new Screen("Consumo", conteudo, displayWidth, displayHeight);
 		        
@@ -308,6 +304,10 @@ public class Screen {
 			        	
 			        }
 			    }, 400);
+			
+				
+				return false;
+				
 				
 			}
 			
