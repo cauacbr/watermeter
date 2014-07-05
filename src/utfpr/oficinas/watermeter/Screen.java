@@ -203,7 +203,7 @@ public class Screen {
                                   
         ImageView icon_sincronizar = new ImageView(context);
         ImageView icon_consumo = new ImageView(context);
-        View logoMenu = new BtnLogoMenuPrincipal(context);
+        View logoMenu = new BtnLogoMenuPrincipal(context, displayWidth, (int) (displayHeight/3));
         
         icon_sincronizar.setImageDrawable(context.getResources().getDrawable(R.drawable.btn_sincronizar));
         icon_consumo.setImageDrawable(context.getResources().getDrawable(R.drawable.btn_consumo));
@@ -286,7 +286,7 @@ public class Screen {
 										
 				RelativeLayout conteudo = new RelativeLayout(context);
 				
-				grafico = new GraficoMedicoes(context);
+				grafico = new GraficoMedicoes(context, displayHeight/18);
 				
 				conteudo.addView(grafico);
 				

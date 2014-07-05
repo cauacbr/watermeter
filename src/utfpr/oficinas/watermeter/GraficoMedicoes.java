@@ -168,9 +168,9 @@ public class GraficoMedicoes extends View{
 	
 	};
 	
-	public GraficoMedicoes(Context context) {
+	public GraficoMedicoes(Context context, int heightButton) {
 		super(context);
-		btnMenosZoom = Bitmap.createScaledBitmap(btnMenosZoom, btnMenosZoom.getWidth()/2, btnMenosZoom.getHeight()/2, true);
+		btnMenosZoom = Bitmap.createScaledBitmap(btnMenosZoom, (int) (4.37*heightButton), heightButton, true);
 	}
 	
 	@Override

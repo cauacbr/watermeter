@@ -45,11 +45,26 @@ public class BtnLogoMenuPrincipal extends View{
 		}
 	};
 	
-	public BtnLogoMenuPrincipal(Context context) {
+	public BtnLogoMenuPrincipal(Context context, int widthView, int heightView) {
 		super(context);
 		
 		appContext = context;
 		logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_menu);
+		
+		float escala = (float) (logo.getHeight())/heightView;
+		Log.d("motion", "fator escala: " + escala);
+		
+		int largura;
+		int altura = (int) (logo.getHeight()/escala);
+		
+		if((logo.getWidth()/escala) < widthView) {
+			largura = widthView;
+			altura = heightView;
+		}else {
+			largura = (int)(logo.getWidth()/escala);
+		}
+		
+		logo = Bitmap.createScaledBitmap(logo, largura, altura, true);
 		
 		// TODO Auto-generated constructor stub
 	}
@@ -57,12 +72,6 @@ public class BtnLogoMenuPrincipal extends View{
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
-		fatorEscala = (float) (this.getWidth())/logo.getWidth();
-		
-		//Log.d("motion", "fator escala: " + fatorEscala);
-		
-		logo = Bitmap.createScaledBitmap(logo, this.getWidth(), (int) (fatorEscala*logo.getHeight()), true);
 		
 		canvas.drawBitmap(logo, 0, 0, defaultPaint);
 		
