@@ -37,7 +37,7 @@ public class BtnLogoMenuPrincipal extends View{
 			if(areaClique.contains((int) (event.getX()), (int) (event.getY()))) {
 				
 				currentInstance.playSoundEffect(SoundEffectConstants.CLICK);
-				Toast.makeText(appContext, "Exibir Mais Dados sobre o consumo com este botão.", Toast.LENGTH_LONG).show();
+				Toast.makeText(appContext, "WaterMeter by\n\nCauã B. Rocha\nHenrique S. Ferreira\nLeandro F. Heroso\nRafael H. Zaleski\n\nOficinas III / 1oSem 2014", Toast.LENGTH_LONG).show();
 				
 			}
 			

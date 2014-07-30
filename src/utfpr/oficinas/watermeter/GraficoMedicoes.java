@@ -50,7 +50,7 @@ public class GraficoMedicoes extends View{
 	private Bitmap btnMenosZoom = BitmapFactory.decodeResource(getResources(), R.drawable.btn_menos_zoom);
 	private Rect fundoBtnMenosZoom = new Rect();
 	
-	private FakeManager dbManager = new FakeManager();
+	private DatabaseHandler dbManager = null;
 	
 	private final Path path = new Path();
 	
@@ -170,7 +170,9 @@ public class GraficoMedicoes extends View{
 	
 	public GraficoMedicoes(Context context, int heightButton) {
 		super(context);
+		this.dbManager = new DatabaseHandler(context);
 		btnMenosZoom = Bitmap.createScaledBitmap(btnMenosZoom, (int) (4.37*heightButton), heightButton, true);
+		
 	}
 	
 	@Override
@@ -270,17 +272,17 @@ public class GraficoMedicoes extends View{
 		sumConsumoLitros = sumConsumoMililitros = 0;
 		maiorMedicaoAcumulada = 0;
 		
+
+		
 		switch(currentZoom) {
 			
 			case ZOOM_YEARS: /********************************************************** ZOOM_YEAR **********************************************************************************/
-				
-				
 				
 				for(int i = dbManager.getMinYear() ; i <= dbManager.getMaxYear(); i++) {
 					
 					for(Medicao medicao: dbManager.getMedicoesByYear(i)) {
 						sumConsumoLitros += medicao.getLitro();
-						sumConsumoMililitros += medicao.getMiliLitro();
+						sumConsumoMililitros += medicao.getMl();
 					}
 					
 					sumConsumoLitros += sumConsumoMililitros/1000;
@@ -353,7 +355,7 @@ public class GraficoMedicoes extends View{
 						
 						for(Medicao medicao: dbManager.getMedicoesByMonth(i, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
-							sumConsumoMililitros += medicao.getMiliLitro();
+							sumConsumoMililitros += medicao.getMl();
 						}
 						
 						sumConsumoLitros += sumConsumoMililitros/1000;
@@ -458,7 +460,7 @@ public class GraficoMedicoes extends View{
 						
 						for(Medicao medicao: dbManager.getMedicoesByDay(i, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
-							sumConsumoMililitros += medicao.getMiliLitro();
+							sumConsumoMililitros += medicao.getMl();
 						}
 						
 						sumConsumoLitros += sumConsumoMililitros/1000;
@@ -531,7 +533,7 @@ public class GraficoMedicoes extends View{
 						
 						for(Medicao medicao: dbManager.getMedicoesByHour(i, currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
-							sumConsumoMililitros += medicao.getMiliLitro();
+							sumConsumoMililitros += medicao.getMl();
 						}
 						
 						sumConsumoLitros += sumConsumoMililitros/1000;
