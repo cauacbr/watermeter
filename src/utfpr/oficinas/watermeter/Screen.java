@@ -69,19 +69,24 @@ public class Screen {
 	private ArrayList<Integer> dia, mes, ano, hora, litro, ml;
 
 	public Screen(String title, RelativeLayout content, int displayWidth,
-			int displayHeight) {
+			int displayHeight, Context context, Activity mainActivity, DatabaseHandler dbHandler) {
 		super();
 		this.title = title;
 		this.content = content;
 		this.displayWidth = displayWidth;
 		this.displayHeight = displayHeight;
-	}
-
-	public Screen(Context context, Activity mainActivity) {
-		super();
-		this.db = new DatabaseHandler(context);
+		
 		this.appContext = context;
 		this.mainActivity = mainActivity;
+		this.db = dbHandler;
+		
+	}
+
+	public Screen(Context context, Activity mainActivity, DatabaseHandler dbHandler) {
+		super();
+		this.appContext = context;
+		this.mainActivity = mainActivity;
+		this.db = dbHandler;
 	}
 
 	public void setDimensions(int width, int height) {
@@ -344,12 +349,12 @@ public class Screen {
 
 				RelativeLayout conteudo = new RelativeLayout(context);
 
-				grafico = new GraficoMedicoes(context, displayHeight / 18);
+				grafico = new GraficoMedicoes(context, displayHeight / 18, db);
 
 				conteudo.addView(grafico);
 
 				final Screen consumo = new Screen("Consumo", conteudo,
-						displayWidth, displayHeight);
+						displayWidth, displayHeight, appContext, mainActivity, db);
 
 				for (int i = 0; i < tela.getChildCount(); i++)
 					tela.getChildAt(i).animate().translationX(displayWidth)
@@ -561,6 +566,10 @@ public class Screen {
 	
 	public void isAllowSync(boolean value) {
 		allowSync = value;
+	}
+	
+	public DatabaseHandler getDbHandler() {
+		return this.db;
 	}
 
 }

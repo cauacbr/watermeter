@@ -2,26 +2,25 @@ package utfpr.oficinas.watermeter;
 
 import java.io.IOException;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
 	// interface
 	private RelativeLayout tela;
 	private DisplayMetrics display;
 	private Screen mainScreen;
-	
+		
 	//Bluetooth
 	private PowerManager powerManager;
 
@@ -51,31 +50,25 @@ public class MainActivity extends ActionBarActivity {
 
 		tela.setBackgroundResource(R.color.fundoTela);
 
-		mainScreen = new Screen(getApplicationContext(), this);
-		mainScreen.setDimensions(display.widthPixels, display.heightPixels);
-		mainScreen.buildMenuWaterMasters(tela, getApplicationContext());
-		
-		mainScreen.isAllowSync(true);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		try {
+			
+			mainScreen = new Screen(getApplicationContext(), this, new DatabaseHandler(this));
+			mainScreen.setDimensions(display.widthPixels, display.heightPixels);
+			mainScreen.buildMenuWaterMasters(tela, getApplicationContext());
+			
+			mainScreen.isAllowSync(true);
+			
+			boolean firstboot = getSharedPreferences("BOOT_PREF", MODE_PRIVATE)
+					.getBoolean("firstboot", true);
+			if (firstboot) {
+				getSharedPreferences("BOOT_PREF", MODE_PRIVATE).edit()
+						.putBoolean("firstboot", false).commit();
+				mainScreen.getDbHandler().fakeAdd();
+			}
+		} catch (Exception e) {
+			Log.d("Main_activity", e.getMessage());
 		}
-		return super.onOptionsItemSelected(item);
+		
 	}
 	
 	@Override

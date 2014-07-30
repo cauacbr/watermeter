@@ -168,9 +168,9 @@ public class GraficoMedicoes extends View{
 	
 	};
 	
-	public GraficoMedicoes(Context context, int heightButton) {
+	public GraficoMedicoes(Context context, int heightButton, DatabaseHandler dbManager) {
 		super(context);
-		this.dbManager = new DatabaseHandler(context);
+		this.dbManager = dbManager;
 		btnMenosZoom = Bitmap.createScaledBitmap(btnMenosZoom, (int) (4.37*heightButton), heightButton, true);
 		
 	}
