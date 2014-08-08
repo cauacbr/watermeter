@@ -55,13 +55,14 @@ public class Screen {
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	private boolean allowSync;
-	
+
 	private BluetoothAdapter btAdapter = null;
 	private BluetoothSocket socket = null;
 	private ArrayList<BluetoothDevice> btDeviceList = new ArrayList<BluetoothDevice>();
 	private BluetoothDevice ourDevice = null;
 	private ConnectedThread mConnectedThread = null;
-	private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+	private static final UUID MY_UUID = UUID
+			.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	private Handler h;
 	private DatabaseHandler db;
 	final int RECIEVE_MESSAGE = 1;
@@ -69,20 +70,22 @@ public class Screen {
 	private ArrayList<Integer> dia, mes, ano, hora, litro, ml;
 
 	public Screen(String title, RelativeLayout content, int displayWidth,
-			int displayHeight, Context context, Activity mainActivity, DatabaseHandler dbHandler) {
+			int displayHeight, Context context, Activity mainActivity,
+			DatabaseHandler dbHandler) {
 		super();
 		this.title = title;
 		this.content = content;
 		this.displayWidth = displayWidth;
 		this.displayHeight = displayHeight;
-		
+
 		this.appContext = context;
 		this.mainActivity = mainActivity;
 		this.db = dbHandler;
-		
+
 	}
 
-	public Screen(Context context, Activity mainActivity, DatabaseHandler dbHandler) {
+	public Screen(Context context, Activity mainActivity,
+			DatabaseHandler dbHandler) {
 		super();
 		this.appContext = context;
 		this.mainActivity = mainActivity;
@@ -94,7 +97,7 @@ public class Screen {
 		this.displayHeight = height;
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	// @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void buildAndShow(final RelativeLayout tela, final Context context) {
 
 		tela.removeAllViews();
@@ -148,19 +151,28 @@ public class Screen {
 			public void onClick(View v) {
 
 				v.setBackgroundResource(R.color.botaoClicado);
+				
+				try {
 
-				mainLayout.animate().translationX(-displayWidth).withLayer()
-						.setDuration(400);
+					mainLayout.animate().translationX(-displayWidth)
+							.withLayer().setDuration(400);
 
-				new Handler().postDelayed(new Runnable() {
+					new Handler().postDelayed(new Runnable() {
 
-					@Override
-					public void run() {
+						@Override
+						public void run() {
 
-						buildMenuWaterMasters(tela, context);
+							buildMenuWaterMasters(tela, context);
 
-					}
-				}, 400);
+						}
+					}, 400);
+
+				} catch (NoSuchMethodError e) {
+
+					Log.d("motion", "voltarListener > Onclick: " + e.getLocalizedMessage());
+					buildMenuWaterMasters(tela, context);
+
+				}
 
 			}
 		};
@@ -188,15 +200,20 @@ public class Screen {
 
 		tela.addView(mainLayout);
 
-		AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-		fadeIn.setDuration(400);
-		fadeIn.setFillAfter(true);
+		try {
 
-		mainLayout.startAnimation(fadeIn);
+				AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+				fadeIn.setDuration(400);
+				fadeIn.setFillAfter(true);
+
+				mainLayout.startAnimation(fadeIn);
+
+		} catch (NoSuchMethodError e) {
+			Log.d("motion", e.getLocalizedMessage());
+		}
 
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public final void buildMenuWaterMasters(RelativeLayout tela, Context context) {
 
 		tela.removeAllViews();
@@ -267,26 +284,31 @@ public class Screen {
 
 		// animação
 
-		AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-		fadeIn.setDuration(400);
-		fadeIn.setFillAfter(true);
+		try {
 
-		containerSincronizar.startAnimation(fadeIn);
-		containerLogo.startAnimation(fadeIn);
-		containerConsumo.startAnimation(fadeIn);
+				AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+				fadeIn.setDuration(400);
+				fadeIn.setFillAfter(true);
+
+				containerSincronizar.startAnimation(fadeIn);
+				containerLogo.startAnimation(fadeIn);
+				containerConsumo.startAnimation(fadeIn);
+
+		} catch (NoSuchMethodError e) {
+			Log.d("motion", e.getLocalizedMessage());
+		}
 
 		// fim animação
 
 		// Listeners
 
 		configMenuListeners(context, tela);
-
+		
 		containerSincronizar.setOnTouchListener(listenerSincronizar);
 		containerConsumo.setOnTouchListener(listenerConsumo);
 
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public final void configMenuListeners(final Context context,
 			final RelativeLayout tela) {
 
@@ -302,13 +324,14 @@ public class Screen {
 				v.playSoundEffect(SoundEffectConstants.CLICK);
 
 				// Configurar Bluetooth a partir daqui
-				
-				IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+
+				IntentFilter filter = new IntentFilter(
+						BluetoothDevice.ACTION_FOUND);
 				filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 				filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
 				allowSync = false;
-				
+
 				if (btAdapter == null && ourDevice == null) {
 					btAdapter = BluetoothAdapter.getDefaultAdapter();
 					mainActivity.registerReceiver(ActionFoundReceiver, filter);
@@ -354,23 +377,34 @@ public class Screen {
 				conteudo.addView(grafico);
 
 				final Screen consumo = new Screen("Consumo", conteudo,
-						displayWidth, displayHeight, appContext, mainActivity, db);
+						displayWidth, displayHeight, appContext, mainActivity,
+						db);
+				
+				try {
 
-				for (int i = 0; i < tela.getChildCount(); i++)
-					tela.getChildAt(i).animate().translationX(displayWidth)
-							.withLayer().setDuration(400);
+					for (int i = 0; i < tela.getChildCount(); i++)
+						tela.getChildAt(i).animate().translationX(displayWidth)
+								.withLayer().setDuration(400);
 
-				new Handler().postDelayed(new Runnable() {
+					new Handler().postDelayed(new Runnable() {
 
-					@Override
-					public void run() {
+						@Override
+						public void run() {
 
-						consumo.buildAndShow(tela, context);
+							consumo.buildAndShow(tela, context);
 
-					}
-				}, 400);
+						}
+					}, 400);
 
-				return false;
+				} catch (NoSuchMethodError e) {
+					Log.d("motion", e.getLocalizedMessage());
+					consumo.buildAndShow(tela, context);
+
+				}
+				
+				Log.d("motion", "voltou do BuildAndShow");
+
+				return true;
 
 			}
 
@@ -420,8 +454,10 @@ public class Screen {
 			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 					.equals(action)) {
 				if (ourDevice == null) {
-					Toast.makeText(appContext, "Não foi possível estabelecer a conexão", Toast.LENGTH_SHORT).show();
-					
+					Toast.makeText(appContext,
+							"Não foi possível estabelecer a conexão",
+							Toast.LENGTH_SHORT).show();
+
 					allowSync = false;
 				}
 			}
@@ -433,7 +469,7 @@ public class Screen {
 		// out = (TextView) findViewById(R.id.out);
 		// sincronizar = (Button) findViewById(R.id.sincronizar);
 		// consumo = (Button) findViewById(R.id.consumo);
-		
+
 		h = new Handler() {
 			public void handleMessage(android.os.Message msg) {
 				switch (msg.what) {
@@ -446,7 +482,8 @@ public class Screen {
 						String sbprint = sb.substring(0, endOfLineIndex);
 						sb.delete(0, sb.length());
 						if (sbprint.substring(0, 1).equalsIgnoreCase("H")) {
-							//int tam = Integer.valueOf(sbprint.substring(1, 3));
+							// int tam = Integer.valueOf(sbprint.substring(1,
+							// 3));
 							int qnt = Integer.valueOf(sbprint.substring(3, 7));
 							int i = 0;
 							ano = new ArrayList<Integer>();
@@ -490,6 +527,7 @@ public class Screen {
 														.get(j), litro.get(j),
 												ml.get(j)));
 									}
+									mConnectedThread.write("0");										
 								}
 							} catch (Exception e) {
 								/*
@@ -531,9 +569,9 @@ public class Screen {
 	public void dados() {
 		Toast.makeText(appContext, "Sincronizando", Toast.LENGTH_SHORT).show();
 		mConnectedThread.write("1");
-		
+
 		allowSync = true;
-		
+
 		Toast.makeText(appContext, "Sincronizado", Toast.LENGTH_SHORT).show();
 	}
 
@@ -551,23 +589,23 @@ public class Screen {
 		}
 		return device.createRfcommSocketToServiceRecord(MY_UUID);
 	}
-	
+
 	public BluetoothSocket getSocket() {
 		return this.socket;
 	}
-	
+
 	public BluetoothAdapter getBtAdapter() {
 		return this.btAdapter;
 	}
-	
+
 	public BroadcastReceiver getActionFoundReceiver() {
 		return this.ActionFoundReceiver;
 	}
-	
+
 	public void isAllowSync(boolean value) {
 		allowSync = value;
 	}
-	
+
 	public DatabaseHandler getDbHandler() {
 		return this.db;
 	}
