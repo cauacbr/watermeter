@@ -1,9 +1,12 @@
 package utfpr.oficinas.watermeter;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -21,11 +24,12 @@ public class MainActivity extends Activity {
 
 	// Bluetooth
 	private PowerManager powerManager;
+	static Handler h;
+	final static int RECIEVE_MESSAGE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		// Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -57,13 +61,6 @@ public class MainActivity extends Activity {
 
 			mainScreen.isAllowSync(true);
 
-			boolean firstboot = getSharedPreferences("BOOT_PREF", MODE_PRIVATE)
-					.getBoolean("firstboot", true);
-			if (firstboot) {
-				getSharedPreferences("BOOT_PREF", MODE_PRIVATE).edit()
-						.putBoolean("firstboot", false).commit();
-				mainScreen.getDbHandler().fakeAdd();
-			}
 		} catch (Exception e) {
 			Log.d("Main_activity", e.getMessage());
 		}
@@ -85,21 +82,37 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	/*
-	 * @Override public void onPause() { super.onPause(); powerManager =
-	 * (PowerManager) getSystemService(POWER_SERVICE); if
-	 * (powerManager.isScreenOn()) { if (mainScreen.getSocket() != null) { try {
-	 * mainScreen.getSocket().close(); } catch (IOException e2) {
-	 * Toast.makeText(getApplicationContext(), e2.getMessage(),
-	 * Toast.LENGTH_SHORT).show(); } } } }
-	 * 
-	 * @Override protected void onDestroy() { super.onDestroy(); if
-	 * (mainScreen.getSocket() != null) { try { mainScreen.getSocket().close();
-	 * } catch (IOException e2) { Toast.makeText(getApplicationContext(),
-	 * e2.getMessage(), Toast.LENGTH_SHORT).show(); } } if
-	 * (mainScreen.getBtAdapter() != null) {
-	 * mainScreen.getBtAdapter().cancelDiscovery();
-	 * this.unregisterReceiver(mainScreen.getActionFoundReceiver()); } }
-	 */
+	@Override
+	public void onPause() {
+		super.onPause();
+		powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+		if (powerManager.isScreenOn()) {
+			if (mainScreen.getSocket() != null) {
+				try {
+					mainScreen.getSocket().close();
+				} catch (IOException e2) {
+					Toast.makeText(getApplicationContext(), e2.getMessage(),
+							Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (mainScreen.getSocket() != null) {
+			try {
+				mainScreen.getSocket().close();
+			} catch (IOException e2) {
+				Toast.makeText(getApplicationContext(), e2.getMessage(),
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+		if (mainScreen.getBtAdapter() != null) {
+			mainScreen.getBtAdapter().cancelDiscovery();
+			this.unregisterReceiver(mainScreen.getActionFoundReceiver());
+		}
+	}
 
 }

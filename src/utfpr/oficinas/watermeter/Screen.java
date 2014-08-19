@@ -3,6 +3,7 @@ package utfpr.oficinas.watermeter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import android.annotation.SuppressLint;
@@ -50,9 +51,14 @@ public class Screen {
 	private View.OnClickListener voltarListener;
 	private View.OnTouchListener listenerSincronizar, listenerConsumo;
 
+	// Salvar SD
+	Save save;
+	String saveData = "";
+
 	// Configuração Bluetooth
 	// bluetooth
 	private static final int REQUEST_ENABLE_BT = 1;
+	String log = "";
 
 	private boolean allowSync;
 
@@ -63,9 +69,9 @@ public class Screen {
 	private ConnectedThread mConnectedThread = null;
 	private static final UUID MY_UUID = UUID
 			.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	private Handler h;
+	protected static final String MODE_PRIVATE = null;
+
 	private DatabaseHandler db;
-	final int RECIEVE_MESSAGE = 1;
 	private StringBuilder sb = new StringBuilder();
 	private ArrayList<Integer> dia, mes, ano, hora, litro, ml;
 
@@ -81,7 +87,7 @@ public class Screen {
 		this.appContext = context;
 		this.mainActivity = mainActivity;
 		this.db = dbHandler;
-
+		this.save = new Save(appContext);
 	}
 
 	public Screen(Context context, Activity mainActivity,
@@ -90,6 +96,8 @@ public class Screen {
 		this.appContext = context;
 		this.mainActivity = mainActivity;
 		this.db = dbHandler;
+		this.save = new Save(appContext);
+		this.callBluetooth();
 	}
 
 	public void setDimensions(int width, int height) {
@@ -151,7 +159,7 @@ public class Screen {
 			public void onClick(View v) {
 
 				v.setBackgroundResource(R.color.botaoClicado);
-				
+
 				try {
 
 					mainLayout.animate().translationX(-displayWidth)
@@ -169,7 +177,8 @@ public class Screen {
 
 				} catch (NoSuchMethodError e) {
 
-					Log.d("motion", "voltarListener > Onclick: " + e.getLocalizedMessage());
+					Log.d("motion",
+							"voltarListener > Onclick: " + e.getMessage());
 					buildMenuWaterMasters(tela, context);
 
 				}
@@ -202,11 +211,11 @@ public class Screen {
 
 		try {
 
-				AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-				fadeIn.setDuration(400);
-				fadeIn.setFillAfter(true);
+			AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+			fadeIn.setDuration(400);
+			fadeIn.setFillAfter(true);
 
-				mainLayout.startAnimation(fadeIn);
+			mainLayout.startAnimation(fadeIn);
 
 		} catch (NoSuchMethodError e) {
 			Log.d("motion", e.getLocalizedMessage());
@@ -286,13 +295,13 @@ public class Screen {
 
 		try {
 
-				AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-				fadeIn.setDuration(400);
-				fadeIn.setFillAfter(true);
+			AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+			fadeIn.setDuration(400);
+			fadeIn.setFillAfter(true);
 
-				containerSincronizar.startAnimation(fadeIn);
-				containerLogo.startAnimation(fadeIn);
-				containerConsumo.startAnimation(fadeIn);
+			containerSincronizar.startAnimation(fadeIn);
+			containerLogo.startAnimation(fadeIn);
+			containerConsumo.startAnimation(fadeIn);
 
 		} catch (NoSuchMethodError e) {
 			Log.d("motion", e.getLocalizedMessage());
@@ -303,7 +312,7 @@ public class Screen {
 		// Listeners
 
 		configMenuListeners(context, tela);
-		
+
 		containerSincronizar.setOnTouchListener(listenerSincronizar);
 		containerConsumo.setOnTouchListener(listenerConsumo);
 
@@ -363,48 +372,60 @@ public class Screen {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				
+				if (db.getContactsCount() > 0) {
+					if (event.getY() < displayHeight / 6) {
+						return false;
+					}
+					v.playSoundEffect(SoundEffectConstants.CLICK);
+					
+					ArrayList<Medicao> blabla = db.getMedicoesByDay(18, 8, 2014);
+					
+					for(int i = 0; i < blabla.size() ; i++ ) {
+						Log.d("watermeter", "SIze = " + blabla.size() + " ;" + blabla.get(i).dia + "/" + blabla.get(i).mes + "/" + blabla.get(i).ano + " - " + blabla.get(i).hora + "hrs -- " +  blabla.get(i).litro + "," + blabla.get(i).ml);
+					}
 
-				if (event.getY() < displayHeight / 6) {
+					RelativeLayout conteudo = new RelativeLayout(context);
+
+					grafico = new GraficoMedicoes(context, displayHeight / 18,
+							db);
+
+					conteudo.addView(grafico);
+
+					final Screen consumo = new Screen("Consumo", conteudo,
+							displayWidth, displayHeight, appContext,
+							mainActivity, db);
+
+					try {
+
+						for (int i = 0; i < tela.getChildCount(); i++)
+							tela.getChildAt(i).animate()
+									.translationX(displayWidth).withLayer()
+									.setDuration(400);
+
+						new Handler().postDelayed(new Runnable() {
+
+							@Override
+							public void run() {
+
+								consumo.buildAndShow(tela, context);
+
+							}
+						}, 400);
+
+					} catch (NoSuchMethodError e) {
+						Log.d("motion", e.getLocalizedMessage());
+						consumo.buildAndShow(tela, context);
+
+					}
+
+					Log.d("motion", "voltou do BuildAndShow");
+					return true;
+				} else {
+					Toast.makeText(appContext, "Não há dados.",
+							Toast.LENGTH_SHORT).show();
 					return false;
 				}
-
-				v.playSoundEffect(SoundEffectConstants.CLICK);
-
-				RelativeLayout conteudo = new RelativeLayout(context);
-
-				grafico = new GraficoMedicoes(context, displayHeight / 18, db);
-
-				conteudo.addView(grafico);
-
-				final Screen consumo = new Screen("Consumo", conteudo,
-						displayWidth, displayHeight, appContext, mainActivity,
-						db);
-				
-				try {
-
-					for (int i = 0; i < tela.getChildCount(); i++)
-						tela.getChildAt(i).animate().translationX(displayWidth)
-								.withLayer().setDuration(400);
-
-					new Handler().postDelayed(new Runnable() {
-
-						@Override
-						public void run() {
-
-							consumo.buildAndShow(tela, context);
-
-						}
-					}, 400);
-
-				} catch (NoSuchMethodError e) {
-					Log.d("motion", e.getLocalizedMessage());
-					consumo.buildAndShow(tela, context);
-
-				}
-				
-				Log.d("motion", "voltou do BuildAndShow");
-
-				return true;
 
 			}
 
@@ -466,81 +487,91 @@ public class Screen {
 
 	@SuppressLint("HandlerLeak")
 	public void callBluetooth() {
-		// out = (TextView) findViewById(R.id.out);
-		// sincronizar = (Button) findViewById(R.id.sincronizar);
-		// consumo = (Button) findViewById(R.id.consumo);
-
-		h = new Handler() {
+		MainActivity.h = new Handler() {
 			public void handleMessage(android.os.Message msg) {
-				switch (msg.what) {
-				case RECIEVE_MESSAGE:
-					byte[] readBuf = (byte[]) msg.obj;
-					String strIncom = new String(readBuf, 0, msg.arg1);
-					sb.append(strIncom);
-					int endOfLineIndex = sb.indexOf("\r\n");
-					if (endOfLineIndex > 0) {
-						String sbprint = sb.substring(0, endOfLineIndex);
-						sb.delete(0, sb.length());
-						if (sbprint.substring(0, 1).equalsIgnoreCase("H")) {
-							// int tam = Integer.valueOf(sbprint.substring(1,
-							// 3));
-							int qnt = Integer.valueOf(sbprint.substring(3, 7));
-							int i = 0;
-							ano = new ArrayList<Integer>();
-							mes = new ArrayList<Integer>();
-							dia = new ArrayList<Integer>();
-							hora = new ArrayList<Integer>();
-							litro = new ArrayList<Integer>();
-							ml = new ArrayList<Integer>();
-							try {
-								for (i = 0; i < qnt; i++) {
-									if (sbprint.substring((7 + i * 16),
-											(8 + i * 16)).equalsIgnoreCase("D")) {
-										Log.d("t4", sbprint.substring(
-												(7 + (i * 16)), (8 + (i * 16))));
-										ano.add(Integer.valueOf(sbprint
-												.substring((8 + (i * 16)),
-														(12 + (i * 16)))));
-										mes.add(Integer.valueOf(sbprint
-												.substring((12 + (i * 16)),
-														(14 + (i * 16)))));
-										dia.add(Integer.valueOf(sbprint
-												.substring((14 + (i * 16)),
-														(16 + (i * 16)))));
-										hora.add(Integer.valueOf(sbprint
-												.substring((16 + (i * 16)),
-														(18 + (i * 16)))));
-										litro.add(Integer.valueOf(sbprint
-												.substring((18 + (i * 16)),
-														(22 + (i * 16)))));
-										ml.add(Integer.valueOf(sbprint
-												.substring((22 + (i * 16)),
-														(23 + (i * 16)))));
+				try {
+					switch (msg.what) {
+					case MainActivity.RECIEVE_MESSAGE:
+						byte[] readBuf = (byte[]) msg.obj;
+						String strIncom = new String(readBuf, 0, msg.arg1);
+						sb.append(strIncom);
+						int endOfLineIndex = sb.indexOf("\r\n");
+						if (endOfLineIndex > 0) {
+							String sbprint = sb.substring(0, endOfLineIndex);
+							sb.delete(0, sb.length());
+							if (sbprint.substring(0, 1).equalsIgnoreCase("H")) {
+								int qnt = Integer.valueOf(sbprint.substring(3,
+										7));
+								int i = 0;
+								ano = new ArrayList<Integer>();
+								mes = new ArrayList<Integer>();
+								dia = new ArrayList<Integer>();
+								hora = new ArrayList<Integer>();
+								litro = new ArrayList<Integer>();
+								ml = new ArrayList<Integer>();
+								try {
+									for (i = 0; i < qnt; i++) {
+										if (sbprint.substring((7 + i * 16),
+												(8 + i * 16)).equalsIgnoreCase(
+												"D")) {
+											Log.d("t4", sbprint.substring(
+													(7 + (i * 16)),
+													(8 + (i * 16))));
+											ano.add(Integer.valueOf(sbprint
+													.substring((8 + (i * 16)),
+															(12 + (i * 16)))));
+											mes.add(Integer.valueOf(sbprint
+													.substring((12 + (i * 16)),
+															(14 + (i * 16)))));
+											dia.add(Integer.valueOf(sbprint
+													.substring((14 + (i * 16)),
+															(16 + (i * 16)))));
+											hora.add(Integer.valueOf(sbprint
+													.substring((16 + (i * 16)),
+															(18 + (i * 16)))));
+											litro.add(Integer.valueOf(sbprint
+													.substring((18 + (i * 16)),
+															(22 + (i * 16)))));
+											ml.add(100*Integer.valueOf(sbprint
+													.substring((22 + (i * 16)),
+															(23 + (i * 16)))));
+										}
 									}
-								}
-								if (sbprint.substring((23 + ((qnt - 1) * 16)),
-										(24 + ((qnt - 1) * 16)))
-										.equalsIgnoreCase("T")) {
-									for (int j = 0; j < qnt; j++) {
-										db.addContact(new Medicao(dia.get(j),
-												mes.get(j), ano.get(j), hora
-														.get(j), litro.get(j),
-												ml.get(j)));
+									if (sbprint.substring(
+											(23 + ((qnt - 1) * 16)),
+											(24 + ((qnt - 1) * 16)))
+											.equalsIgnoreCase("T")) {
+										for (int j = 0; j < qnt; j++) {
+											db.addContact(new Medicao(dia
+													.get(j), mes.get(j), ano
+													.get(j), hora.get(j), litro
+													.get(j), ml.get(j)));
+										}
+										mConnectedThread.write("0");
+
+										// List<Medicao> contacts = db
+										// .getMedicoes();
+										savetosd();
+										/*
+										 * Toast.makeText(appContext,
+										 * "Dados salvos no cartão.",
+										 * Toast.LENGTH_SHORT).show();
+										 */
 									}
-									mConnectedThread.write("0");										
+								} catch (Exception e) {
+									Toast.makeText(appContext,
+											"Tente novamente",
+											Toast.LENGTH_SHORT).show();
 								}
-							} catch (Exception e) {
-								/*
-								 * Toast.makeText(appContext, e.getMessage(),
-								 * Toast.LENGTH_SHORT) .show();
-								 */
-								Toast.makeText(appContext, "Tente novamente",
-										Toast.LENGTH_SHORT).show();
 							}
 						}
+						break;
 					}
-					break;
+
+				} catch (Exception e) {
+					Log.d("ScreenHandlerO", e.getMessage());
 				}
+
 			};
 		};
 
@@ -557,7 +588,8 @@ public class Screen {
 					Toast.LENGTH_SHORT).show();
 		}
 		if (mConnectedThread == null) {
-			mConnectedThread = new ConnectedThread(socket, appContext, h);
+			mConnectedThread = new ConnectedThread(socket, appContext,
+					MainActivity.h);
 			mConnectedThread.start();
 		}
 
@@ -608,6 +640,19 @@ public class Screen {
 
 	public DatabaseHandler getDbHandler() {
 		return this.db;
+	}
+
+	public void savetosd() {
+		List<Medicao> contacts = db.getMedicoes();
+		if (contacts != null) {
+			for (Medicao cn : contacts) {
+				log = log + "" + ";" + cn.getDia() + ";" + cn.getMes() + ";"
+						+ cn.getAno() + ";" + cn.getHora() + ";"
+						+ cn.getLitro() + "," + cn.getMl() + ";" + "\n";
+				save.saveSD(log);
+			}
+
+		}
 	}
 
 }

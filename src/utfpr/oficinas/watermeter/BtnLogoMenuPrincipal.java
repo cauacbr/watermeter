@@ -4,16 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 public class BtnLogoMenuPrincipal extends View{
@@ -38,7 +34,7 @@ public class BtnLogoMenuPrincipal extends View{
 				
 				currentInstance.playSoundEffect(SoundEffectConstants.CLICK);
 				Toast.makeText(appContext, "WaterMeter by\n\nCauã B. Rocha\nHenrique S. Ferreira\nLeandro F. Heroso\nRafael H. Zaleski\n\nOficinas III / 1oSem 2014", Toast.LENGTH_LONG).show();
-				
+
 			}
 			
 			return false;

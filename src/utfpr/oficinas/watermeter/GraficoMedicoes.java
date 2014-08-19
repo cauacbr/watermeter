@@ -351,7 +351,7 @@ public class GraficoMedicoes extends View{
 										
 					
 					
-					for(int i = dbManager.getMinMonth(currentZoomRefAno) ; i <= 12; i++) {
+					for(int i = 1 ; i <= 12; i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByMonth(i, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -407,7 +407,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((12 - dbManager.getMinMonth(currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*(6)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 					
 					//*********************************
 					
@@ -456,7 +456,7 @@ public class GraficoMedicoes extends View{
 					
 					configDataAux(); //Arruma o calendário para descobrir o maior dia do mês no mês em zoom
 					
-					for(int i = dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno) ; i <= dataAux.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
+					for(int i = 1 ; i <= dataAux.getActualMaximum(Calendar.DAY_OF_MONTH); i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByDay(i, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -482,7 +482,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((dataAux.getActualMaximum(Calendar.DAY_OF_MONTH) - dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*(dataAux.getActualMaximum(Calendar.DAY_OF_MONTH) - 6)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 					
 					//*********************************
 					
@@ -529,7 +529,7 @@ public class GraficoMedicoes extends View{
 				
 				case ZOOM_HOURS: /********************************************************** ZOOM_HOUR **********************************************************************************/
 					
-					for(int i = dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno) ; i <= 23; i++) {
+					for(int i = 1 ; i <= 23; i++) {
 						
 						for(Medicao medicao: dbManager.getMedicoesByHour(i, currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) {
 							sumConsumoLitros += medicao.getLitro();
@@ -554,7 +554,7 @@ public class GraficoMedicoes extends View{
 					
 					//*********************************
 					
-					MIN_TRANSLATION = -1*((23 - dbManager.getMinHour(currentZoomRefDia, currentZoomRefMes, currentZoomRefAno)) - 5)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
+					MIN_TRANSLATION = -1*(17)*(barWidth + barMargin); //total de barras - 5. 6 é o número que cabe na tela
 										
 					//*********************************
 					
@@ -622,12 +622,12 @@ public class GraficoMedicoes extends View{
 				break;
 				
 			case ZOOM_MONTHS:
-				currentZoomRefMes = dbManager.getMinMonth(currentZoomRefAno) + index;
+				currentZoomRefMes = 1 + index;
 				currentZoom = ZOOM_DAYS;
 				break;
 				
 			case ZOOM_DAYS:
-				currentZoomRefDia = dbManager.getMinDay(currentZoomRefMes, currentZoomRefAno) + index;
+				currentZoomRefDia = 1 + index;
 				currentZoom = ZOOM_HOURS;
 				break;
 			
